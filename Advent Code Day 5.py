@@ -1,8 +1,8 @@
 import numpy as np
 import re
 
-textFile = open("C:\\Users\Predinchuk\AdventOfCode2023\Advent Day 5 Inputs.txt")
-# textFile = open("C:\\Users\Predinchuk\AdventOfCode2023\Testing Day 5.txt")
+# textFile = open("C:\\Users\Predinchuk\AdventOfCode2023\Advent Day 5 Inputs.txt")
+textFile = open("C:\\Users\Predinchuk\AdventOfCode2023\Testing Day 5.txt")
 
 parsedData = []
 mapData = []
@@ -26,18 +26,39 @@ i = 0
 
 
 while i < len(seedRange):
-    seeds = seeds + list(np.arange(seedRange[i], seedRange[i] + seedRange[i+1]))
+    seeds = seeds + [seedRange[i], seedRange[i] + seedRange[i+1] - 1]
     i += 2
 # print(seeds)
 
+seedsToAdd = []
+
 for mapper in mapData[1:]:
-    # print(f"mapper: {mapper}")
+    for mapInstruction in mapper[1:]:
+
+        destSourceAmount = re.findall(r'\d+', mapInstruction)
+        source = int(destSourceAmount[1])
+        amount = int(destSourceAmount[2])
+
+        i = 0
+        while i < len(seeds):
+            if seeds[i] < source < seeds[i+1]:
+                seedsToAdd = seedsToAdd + [source]
+            if seeds[i] < source + amount - 1 < seeds[i+1]:
+                seedsToAdd = seedsToAdd + [source + amount -1]
+            i += 2
+
+seeds = seeds + seedsToAdd
+print(seeds)
+
+for mapper in mapData[1:]:
+    print(f"mapper: {mapper}")
 
     alreadyUpdated = []
     oldseeds = seeds.copy()
 
     for mapInstruction in mapper[1:]:
-        # print(f"seeds: {seeds}")
+        print(f"seeds: {seeds}")
+
         # print(f"current instruction: {mapInstruction}")
         
         destSourceAmount = re.findall(r'\d+', mapInstruction)
@@ -56,4 +77,6 @@ for mapper in mapData[1:]:
                     seeds[seedIndex] = destination - source + seed
                     # print(f"seed {seed} updated to {seeds[seedIndex]}")
                     alreadyUpdated.append(seedIndex)
+
+print(seeds)
 print(min(seeds))
